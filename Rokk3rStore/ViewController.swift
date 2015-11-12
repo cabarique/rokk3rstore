@@ -24,13 +24,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         storeDAO = StoreDAO()
         store = storeDAO?.getShoppingCart()
         items = storeDAO?.getStockItems()
-        for i in 0...(store!.items.count-1){
-            itemsCounter += (store?.items[i].onSale)!
+        if store!.items.count > 0 {
+            for i in 0...(store!.items.count-1) {
+                itemsCounter += (store?.items[i].onSale)!
+            }
         }
         numberOfItems.text = String(itemsCounter)
         self.cart.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "getCart"))
         // Do any additional setup after loading the view, typically from a nib.
     }
+    
+
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

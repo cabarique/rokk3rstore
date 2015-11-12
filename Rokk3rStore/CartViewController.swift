@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import RealmSwift
 
 class CartViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -16,7 +17,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var back: UIButton!
     @IBOutlet weak var total: UILabel!
     
-    var uniqueItems = [ItemModel]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,9 +24,6 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         store = storeDAO?.getShoppingCart()
         total.text = "total $\(store!.total)"
         
-//        for i in 0...store?.items.count{
-//            
-//        }
         // Do any additional setup after loading the view.
     }
 
@@ -48,6 +45,23 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         
         return cell
+    }
+    
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        if editingStyle == UITableViewCellEditingStyle.Delete{
+            tableView.beginUpdates()
+            let item = store?.items[indexPath.row]
+            let realm = try! Realm()
+            try! realm.write({ () -> Void in
+                item!.stock += item!.onSale
+                item!.onSale = 0
+                self.store?.items.removeAtIndex(indexPath.row)
+            })
+            
+            store = storeDAO?.getShoppingCart()
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
+            tableView.endUpdates()
+        }
     }
     
     @IBAction func back(sender: AnyObject) {
