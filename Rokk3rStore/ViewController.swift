@@ -14,6 +14,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     var storeDAO: StoreDAO?
     var store: ShoppingCartModel?
     var items: Results<ItemModel>?
+    var itemsCounter = 0
 
     @IBOutlet weak var numberOfItems: UILabel!
     @IBOutlet weak var cart: UIView!
@@ -23,7 +24,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         storeDAO = StoreDAO()
         store = storeDAO?.getShoppingCart()
         items = storeDAO?.getStockItems()
-        numberOfItems.text = String(store!.items.count)
+        for i in 0...(store!.items.count-1){
+            itemsCounter += (store?.items[i].onSale)!
+        }
+        numberOfItems.text = String(itemsCounter)
         self.cart.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "getCart"))
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -40,7 +44,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("itemCell", forIndexPath: indexPath) as UITableViewCell
         let item = items![indexPath.row]
-        print(items!.count)
         if item.stock > 0 {
             cell.textLabel?.text = item.name as String
             cell.detailTextLabel?.text = "$\(item.price) QTY: \(item.stock)" as String
@@ -60,12 +63,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let item = items![indexPath.row]
+        itemsCounter++
+        numberOfItems.text = String(itemsCounter)
         tableView.beginUpdates()
         if item.stock > 0 {
-            numberOfItems.text = String(store!.items.count)
             let realm = try! Realm()
             try! realm.write({ () -> Void in
-                item.stock -= 1
+                item.stock--
+                item.onSale++
                 self.store?.total += item.price
             })
             
@@ -83,9 +88,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func addItemToCart(addedItem: ItemModel){
         let realm = try! Realm()
-        try! realm.write({ () -> Void in
-            self.store?.items.append(addedItem)
-        })
+        let resultSet = self.store?.items.filter("name = '\(addedItem.name)'")
+        if resultSet?.count == 0 {
+            try! realm.write({ () -> Void in
+                self.store?.items.append(addedItem)
+            })
+        }
     }
     
     func getCart(){

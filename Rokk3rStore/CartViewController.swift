@@ -16,11 +16,17 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var back: UIButton!
     @IBOutlet weak var total: UILabel!
     
+    var uniqueItems = [ItemModel]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         storeDAO = StoreDAO()
         store = storeDAO?.getShoppingCart()
         total.text = "total $\(store!.total)"
+        
+//        for i in 0...store?.items.count{
+//            
+//        }
         // Do any additional setup after loading the view.
     }
 
@@ -37,7 +43,7 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
         let cell = tableView.dequeueReusableCellWithIdentifier("itemCartCell", forIndexPath: indexPath) as UITableViewCell
         let item = store!.items[indexPath.row]
         cell.textLabel?.text = item.name as String
-        cell.detailTextLabel?.text = "$\(item.price) QTY: \(item.stock)" as String
+        cell.detailTextLabel?.text = "$\(item.price) QTY: \(item.onSale)" as String
         
         
         

@@ -14,6 +14,7 @@ class ItemModel: Object {
     dynamic var name = ""
     dynamic var price = 0
     dynamic var stock = 0
+    dynamic var onSale = 0
     
     
     

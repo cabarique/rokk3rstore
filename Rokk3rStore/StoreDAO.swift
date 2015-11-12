@@ -34,6 +34,12 @@ class StoreDAO: NSObject {
         })
     }
     
+//    func saveCartItem(newITem: ItemModel){
+//        let realm = try! Realm()
+//        let cartItems = realm.objects(ShoppingCartModel).first
+//        cartItems?.items.filter(<#T##predicate: NSPredicate##NSPredicate#>)
+//    }
+    
     
     func getItems() -> Results<ItemModel>{
         let realm = try! Realm()
