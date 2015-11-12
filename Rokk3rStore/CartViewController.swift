@@ -14,11 +14,13 @@ class CartViewController: UIViewController, UITableViewDelegate, UITableViewData
     var store: ShoppingCartModel?
 
     @IBOutlet weak var back: UIButton!
+    @IBOutlet weak var total: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         storeDAO = StoreDAO()
         store = storeDAO?.getShoppingCart()
+        total.text = "total $\(store!.total)"
         // Do any additional setup after loading the view.
     }
 

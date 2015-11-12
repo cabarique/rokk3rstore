@@ -15,6 +15,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     var store: ShoppingCartModel?
     var items: Results<ItemModel>?
 
+    @IBOutlet weak var numberOfItems: UILabel!
     @IBOutlet weak var cart: UIView!
     
     override func viewDidLoad() {
@@ -22,6 +23,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         storeDAO = StoreDAO()
         store = storeDAO?.getShoppingCart()
         items = storeDAO?.getStockItems()
+        numberOfItems.text = String(store!.items.count)
         self.cart.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "getCart"))
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -60,9 +62,11 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let item = items![indexPath.row]
         tableView.beginUpdates()
         if item.stock > 0 {
+            numberOfItems.text = String(store!.items.count)
             let realm = try! Realm()
             try! realm.write({ () -> Void in
                 item.stock -= 1
+                self.store?.total += item.price
             })
             
             if item.stock == 0 {
