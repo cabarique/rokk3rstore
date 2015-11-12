@@ -12,10 +12,12 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var storeDAO: StoreDAO?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        storeDAO = StoreDAO()
+        willLoadDummyData()
         return true
     }
 
@@ -39,6 +41,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+    
+    func willLoadDummyData () {
+        
+        if storeDAO!.getIsDataLoaded() == false {
+            loadDummyData()
+            storeDAO!.saveIsDataLoaded(true)
+        }
+
+    }
+    
+    func loadDummyData(){
+        for index in 1...20 {
+            let newItem = ItemModel()
+            newItem.name = "Item\(index)"
+            newItem.price = (index * 100)
+            newItem.stock = (index + 1 )
+            storeDAO?.saveItem(newItem)
+        }
     }
 
 
